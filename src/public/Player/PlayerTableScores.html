@@ -1,0 +1,72 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="ChipStack.html">
+
+<polymer-element name="player-table-scores" attributes="players">
+
+    <template>
+        <div style="text-align: center;">
+            <template if="{{players.length == 0}}">
+                <h1>Waiting...</h1>
+            </template>
+            <template if="{{players.length > 0}}">
+                <h1>Tournament round #{{ round }}</h1>
+                <div style="text-align: center;">
+                    <template repeat="{{ player in players}}">
+                        <div style=" padding: 2px; display: inline-block; width: 256px; margin: 4px; border: 1px solid black; background: rgba(128,128,128, 0.3); text-align: center">
+                            <div style="font-size: 2em; float: right; position: absolute; margin-left: 12px; margin-top: 8px;">#{{player.tableOrder}}</div>
+                            <div id="avatar" style="font-size: 2em; float: right; position: absolute; margin-left: 200px;"><img style="width:48px" src="http://robohash.org/{{player.name}}.png"></div>
+                            <div style="font-size:1.3em; font-weight: bold;">{{player.name}}</div>
+                            <div>${{ player.chips }}</div>
+                            <div style="">
+                                <chip-stack amount="{{player.chips}}"></chip-stack>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </div>
+    </template>
+
+    <script>
+        console.log("players:", window.players);
+        
+        var PLAYER_ID_KEY = "name";
+        
+        Polymer('player-table-scores', {
+            players: [],
+            round: 0,
+            findPlayerIndexById: function(id){
+                if (this.players && typeof this.players.length == "number") {
+                    var candidate = undefined;
+                    for (var i= 0, max=this.players.length; i<max && candidate == undefined; i+=1) {
+                        if (this.players[i][PLAYER_ID_KEY] == id) {
+                            return i;
+                        }
+                    }
+                }
+                return undefined;
+            },
+            addPlayers: function(players) {
+                var self = this;
+                players.forEach(function(player) {
+                    var playerIndex = self.findPlayerIndexById(player[PLAYER_ID_KEY]);
+                    if (playerIndex !== undefined) {
+                        self.players[playerIndex].chips = player.chips;
+                    } else {
+                        self.players.push(player);
+                    }
+                });
+                
+                this.players.concat().sort(function(a,b){
+                    return b.chips-a.chips;
+                }).forEach(function(e,i){
+                    e.tableOrder = i+1;
+                });
+            },
+            resetTable: function() {
+                this.players = [];
+            }
+        });
+    </script>
+
+</polymer-element>

@@ -1,0 +1,94 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<polymer-element name="chip-stack" attributes="amount">
+
+    <template>
+        <div>
+            <div>
+                <canvas width="240" height="128"></canvas>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        
+        var chipsData = [
+            {value: 5000, color: "black", src: "chips_white_black.svg"},
+            {value: 1000, color: "yellow", src: "chips_white_yellow.svg"},
+            {value: 250, color: "green", src: "chips_white_green.svg"},
+            {value: 100, color: "blue", src: "chips_white_darkblue.svg"},
+            {value: 10, color: "lightblue", src: "chips_white_blue.svg"},
+            {value: 5, color: "red", src: "chips_white_red.svg"},
+            {value: 1, color: "white", src:"chips_white.svg"}
+        ].map(function(e){e.id = e.value.toString(); return e;}); // adds a string 'id' property equal to the 'value'
+        
+        var chipsImages = {};
+        chipsData.forEach(function(e){
+            var img = new Image();
+            img.src = './Player/' + e.src;
+            img.width = '48';
+            img.height = '32';
+            chipsImages[e.id] = img;
+        });
+
+        function drawStack(canvas, position, id, chipData, count, cWidth) {
+            var ctx = canvas.getContext("2d");
+            var height = count * 8;
+            ctx.beginPath();
+            ctx.fillStyle = chipData.color;
+            ctx.strokeStyle = chipData.color;
+            ctx.fillText(id, position, canvas.height);
+            //ctx.fillRect(position, 128-height, cWidth, height);
+            var tokSpace =  chipsImages[id].height / 3;
+            for (var i= 0, y = canvas.height - 30; i<count; i+=1, y-=tokSpace) {
+                ctx.drawImage(chipsImages[id], position, y, 24, 24);
+            }
+            // ctx.drawImage(chipsImages[id], position, 128 - height, 24, 24);
+            ctx.stroke();
+            console.log("drawing", count, chipData.color);
+        }
+        
+        function updateCanvasWithAmount(canvas, amount, cWidth, cMargin) {
+            var columns = {};
+            chipsData.forEach(function(data){
+                var remainer = amount % data.value;
+                var integ = amount - remainer;
+                if (integ>0) {
+                    var chipscount = Math.floor(integ/data.value);
+                    amount -= data.value * chipscount;
+                    columns[data.id] = {id: data.id, count: chipscount, chip: {value: data.value, color: data.color}};
+                }
+            });
+
+            var ctx = canvas.getContext("2d");
+            ctx.clearRect(0,0, canvas.width,canvas.height);
+            
+            for (var i=chipsData.length-1, pos = cMargin; i>=0; i-=1, pos+=(cWidth+cMargin)) {
+                var data = columns[chipsData[i].id] || {id:chipsData[i].id, count:0, chip: {color: chipsData[i].color}};
+                drawStack(canvas, pos, data.id, data.chip || {}, data.count || 0, cWidth);
+            }
+            
+        }
+        
+        Polymer('chip-stack', {
+            amount: 0,
+            chipWidth: 0,
+            chipMargin: 2,
+            amountChanged: function(oldval, newval) {
+                var canvas = this.shadowRoot.querySelector("canvas");
+                console.log("Amount changed", oldval, newval);
+                canvas && updateCanvasWithAmount(canvas, newval, this.chipWidth, this.chipMargin);
+            },
+            updateGeometry: function(){
+                var canvas = this.shadowRoot.querySelector("canvas");
+                this.chipWidth = ((canvas.width-this.chipMargin) / chipsData.length) - this.chipMargin;
+            },
+            domReady: function(){
+                var canvas = this.shadowRoot.querySelector("canvas");
+                this.chipWidth = (canvas.width / chipsData.length) - this.chipMargin;
+                console.log("canvas found", canvas);
+            }
+        });
+    </script>
+
+</polymer-element>

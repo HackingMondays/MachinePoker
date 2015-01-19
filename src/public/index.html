@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap 101 Template</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <link href="Player/PlayerTableScores.html" rel="import">
+    <style>
+        html {
+            margin: 0; padding: 0;
+            background: url(https://farm3.staticflickr.com/2433/3612835353_74e7938b4a_o.jpg) #226622 no-repeat center fixed;
+            background-size: cover; -webkit-background-size: cover;
+        }
+        body {
+            background-color: transparent;
+            color: white;
+        }
+    </style>
+</head>
+<body >
+
+<div class="container">
+    <player-table-scores id="playerlist" players="{{players}}"></player-table-scores>
+
+    <div id="instructions">
+        <h1>Instructions</h1>
+        <div>
+            Connect the server to this remote observer: <tt>http://IP:3001/observer/complete</tt>
+        </div>
+    </div>
+
+    <div style="margin-top: 32px;">
+        <button class="btn btn-lg" id="runTestButton">Start mock server for 100 rounds</button>
+    </div>
+</div>
+<div>
+  <form id="create-table" action="tables" method="post">
+    <label for="randBot">
+      Bot Random <input type="checkbox" id="randBot" name="randBot">
+    </label>
+    <label for="foldBot">
+      Bot Fold <input type="checkbox" name="foldBot" id="foldBot">
+    </label>
+    <label for="callBot">
+      Bot Call <input type="checkbox" name="callBot" id="callBot">
+    </label>
+
+    <button name="run" type="submit">Run</button>
+  </form>
+</div>
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="js/bootstrap.min.js"></script>
+<script src="https://cdn.socket.io/socket.io-1.2.1.js"></script>
+
+<script>
+    var socket = io.connect();
+    window.addEventListener('polymer-ready', function(e) {
+        var pl = document.querySelector("#playerlist");
+        socket.on('game complete', function(msg){
+            console.log("received event", msg);
+            $("#instructions").hide();
+            if (msg.players) {
+                //pl.players = msg.players;
+                pl.round+=1;
+                pl.addPlayers(msg.players);
+            }
+        });
+        $("#runTestButton").click(function(event){
+            $.get("/run-test");
+            event.preventDefault();
+        });
+    });
+    $(function() {
+      $('#create-table').on('submit', function(event) {
+        event.preventDefault();
+
+        $.post('/tables', $('#create-table').serialize(), function(data) {
+          console.log(data);
+        }, 'json');
+
+        return false;
+      })
+    })
+</script>
+
+</body>
+</html>
