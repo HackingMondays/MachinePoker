@@ -45,7 +45,6 @@
             }
             // ctx.drawImage(chipsImages[id], position, 128 - height, 24, 24);
             ctx.stroke();
-            console.log("drawing", count, chipData.color);
         }
         
         function updateCanvasWithAmount(canvas, amount, cWidth, cMargin) {
@@ -76,7 +75,6 @@
             chipMargin: 2,
             amountChanged: function(oldval, newval) {
                 var canvas = this.shadowRoot.querySelector("canvas");
-                console.log("Amount changed", oldval, newval);
                 canvas && updateCanvasWithAmount(canvas, newval, this.chipWidth, this.chipMargin);
             },
             updateGeometry: function(){
@@ -86,7 +84,6 @@
             domReady: function(){
                 var canvas = this.shadowRoot.querySelector("canvas");
                 this.chipWidth = (canvas.width / chipsData.length) - this.chipMargin;
-                console.log("canvas found", canvas);
             }
         });
     </script>

@@ -12,11 +12,11 @@ exports.Seat = class RemoteSeat extends Seat
     @timeout = @opts.timeout || 1000
     # Allow for spinning up cold Heroku bots
     @setupTimeout = @opts.setupTimeout || 10000
+    @name = "Test"
 
   setup: (url, callback) ->
     request.get {url: url, json: true, timeout: @setupTimeout}, (e, r, response) =>
       if e || r.statusCode != 200
-        console.log(e, r.statusCode)
         callback(e || "Returned #{r.statusCode}")
         return false
       @info = response.info
@@ -42,4 +42,3 @@ exports.create = (url, opts, callback) ->
   bot.setup url, (err) ->
     callback?(err, bot)
   bot
-

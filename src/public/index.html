@@ -27,6 +27,10 @@
             background-color: transparent;
             color: white;
         }
+        input, textarea {
+            color: black;
+            background: lightcyan;
+        }
     </style>
 </head>
 <body >
@@ -34,32 +38,41 @@
 <div class="container">
     <player-table-scores id="playerlist" players="{{players}}"></player-table-scores>
 
-    <div id="instructions">
-        <h1>Instructions</h1>
-        <div>
-            Connect the server to this remote observer: <tt>http://IP:3001/observer/complete</tt>
-        </div>
+    <div>
+        <form id="create-table" action="tables" method="post">
+            <h1>Start a new table</h1>
+            <div>
+                <h3>Simple basic robots</h3>
+                <label for="randBot">
+                    Bot Random <input type="checkbox" id="randBot" name="bot-randBot">
+                </label>
+                <label for="foldBot">
+                    Bot Fold <input type="checkbox" name="bot-foldBot" id="foldBot">
+                </label>
+                <label for="callBot">
+                    Bot Call <input type="checkbox" name="bot-callBot" id="callBot">
+                </label>
+                <div>
+                    <h3>Remote Robots</h3>
+                    <div><i>One url per line</i></div>
+                    <textarea id="remote-bot-list" style="width: 600px; color: black;" name="botlist"></textarea>
+                </div>
+                <div>
+                    <label>Number of rounds</label>
+                    <input type="number" name="rounds" value="1000">
+                </div>
+            </div>
+            <div style="margin-top: 1em;">
+                <button class="btn" name="run" type="submit">Start a new tournament table</button>
+            </div>
+
+        </form>
     </div>
 
-    <div style="margin-top: 32px;">
-        <button class="btn btn-lg" id="runTestButton">Start mock server for 100 rounds</button>
-    </div>
 </div>
-<div>
-  <form id="create-table" action="tables" method="post">
-    <label for="randBot">
-      Bot Random <input type="checkbox" id="randBot" name="randBot">
-    </label>
-    <label for="foldBot">
-      Bot Fold <input type="checkbox" name="foldBot" id="foldBot">
-    </label>
-    <label for="callBot">
-      Bot Call <input type="checkbox" name="callBot" id="callBot">
-    </label>
 
-    <button name="run" type="submit">Run</button>
-  </form>
-</div>
+<div></div>
+
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <!-- Include all compiled plugins (below), or include individual files as needed -->
@@ -87,13 +100,37 @@
     $(function() {
       $('#create-table').on('submit', function(event) {
         event.preventDefault();
-
+        var data = $('#create-table').serialize();
+          console.log("data", data);
         $.post('/tables', $('#create-table').serialize(), function(data) {
-          console.log(data);
+            console.log(data);
+            $("#create-table").hide();
+            $("#instructions").hide();
+            socket.on('game-complete-' + data.id, function(msg){
+                console.log("received event", msg);
+                if (msg.players) {
+                    var pl = document.querySelector("#playerlist");
+//                    pl.players = msg.players;
+                    pl.round+=1;
+                    pl.addPlayers(msg.players);
+                }
+            });
+
         }, 'json');
 
         return false;
-      })
+      });
+
+        $('#remote-bot-list').blur(function(){
+            console.log('bot list', $("#remote-bot-list").val());
+            if (window.localStorage) {
+                window.localStorage.setItem('robot-list', $("#remote-bot-list").val());
+            }
+        });
+        if (window.localStorage) {
+            $('#remote-bot-list').val(window.localStorage.getItem('robot-list') || '');
+        }
+
     })
 </script>
 

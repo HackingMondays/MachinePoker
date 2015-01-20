@@ -6,7 +6,7 @@
     <template>
         <div style="text-align: center;">
             <template if="{{players.length == 0}}">
-                <h1>Waiting...</h1>
+                <h1>Game not started (yet)</h1>
             </template>
             <template if="{{players.length > 0}}">
                 <h1>Tournament round #{{ round }}</h1>
@@ -28,8 +28,6 @@
     </template>
 
     <script>
-        console.log("players:", window.players);
-        
         var PLAYER_ID_KEY = "name";
         
         Polymer('player-table-scores', {
