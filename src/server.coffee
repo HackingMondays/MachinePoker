@@ -5,13 +5,16 @@ morgan = require 'morgan'
 cookieParser = require 'cookie-parser'
 session = require 'express-session'
 socketio = require 'socket.io'
+open = require 'open'
+
 PlayersController = require './controllers/PlayersController'
 TablesController = require './controllers/TablesController'
 
 port = 8080;
+openBrowser = process.argv.map((s) -> s == "--open").filter((x)->x).length>0;
 
 class Server
-  constructor: () ->
+  constructor: (callback) ->
     @app = express()
     @server = require('http').Server(@app)
     @socket = socketio @server
@@ -24,6 +27,8 @@ class Server
     @app.use "/", express.static("#{__dirname}/public/")
     @server.listen port, () =>
       console.log 'Ready. Listening on port ' + port
+      if typeof callback == "function"
+        callback()
 
     @socket.on 'connection',  (socket) =>
       socket.emit 'news',
@@ -31,4 +36,6 @@ class Server
       socket.on 'my other event', (data) ->
           console.log data
 
-new Server()
+new Server () -> 
+  if openBrowser
+    open("http://localhost:" + port + "/")
