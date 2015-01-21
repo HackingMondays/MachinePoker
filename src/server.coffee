@@ -8,6 +8,8 @@ socketio = require 'socket.io'
 PlayersController = require './controllers/PlayersController'
 TablesController = require './controllers/TablesController'
 
+port = 8080;
+
 class Server
   constructor: () ->
     @app = express()
@@ -20,8 +22,8 @@ class Server
     @playersController = new PlayersController(@app)
     @tablesController = new TablesController(@app, @socket)
     @app.use "/", express.static("#{__dirname}/public/")
-    @server.listen 8080, () =>
-      console.log 'started !!!'
+    @server.listen port, () =>
+      console.log 'Ready. Listening on port ' + port
 
     @socket.on 'connection',  (socket) =>
       socket.emit 'news',
