@@ -31,41 +31,61 @@
             color: black;
             background: lightcyan;
         }
+        button {
+            color: black;
+        }
+        .local-robot-list label {
+            display: block;
+        }
     </style>
 </head>
 <body >
 
 <div class="container">
-    <player-table-scores id="playerlist" players="{{players}}"></player-table-scores>
+    
+    <div id="running-game" style="display: none;">
+        <player-table-scores id="playerlist" players="{{players}}"></player-table-scores>
+        <div>
+            <button id="stop-game">Play again</button>
+        </div>
+    </div>
 
-    <div>
+    <div id="start-error"></div>
+    <div id="configuration" style="display: none;">
+        
         <form id="create-table" action="tables" method="post">
             <h1>Start a new table</h1>
-            <div>
-                <h3>Simple basic robots</h3>
-                <label for="randBot">
-                    Bot Random <input type="checkbox" id="randBot" name="bot-randBot">
-                </label>
-                <label for="foldBot">
-                    Bot Fold <input type="checkbox" name="bot-foldBot" id="foldBot">
-                </label>
-                <label for="callBot">
-                    Bot Call <input type="checkbox" name="bot-callBot" id="callBot">
-                </label>
-                <div>
-                    <h3>Remote Robots</h3>
-                    <div><i>One url per line</i></div>
-                    <textarea id="remote-bot-list" style="width: 600px; color: black;" name="botlist"></textarea>
+            <div  class="row">
+                <div class="col-md-8">
+                    <div>
+                        <h3>Remote Robots</h3>
+                        <div><i>One url per line</i></div>
+                        <textarea id="remote-bot-list" style="width: 100%; min-height: 300px; color: black;" name="botlist"></textarea>
+                    </div>
+                    <div>
+                        <label>Number of rounds</label>
+                        <input type="number" name="rounds" value="1000" style="text-align: right; width: 5em;">
+                    </div>
                 </div>
-                <div>
-                    <label>Number of rounds</label>
-                    <input type="number" name="rounds" value="1000">
+                <div class="col-md-4 local-robot-list">
+                    <h3>Simple basic robots</h3>
+                    <div><i>Spare robot partners that run locally</i></div>
+                    <label for="randBot">
+                        <input type="checkbox" id="randBot" name="bot-randBot"> Bot Random
+                    </label>
+                    <label for="foldBot">
+                        <input type="checkbox" name="bot-foldBot" id="foldBot"> Bot Fold
+                    </label>
+                    <label for="callBot">
+                        <input type="checkbox" name="bot-callBot" id="callBot"> Bot Call
+                    </label>
                 </div>
             </div>
-            <div style="margin-top: 1em;">
-                <button class="btn" name="run" type="submit">Start a new tournament table</button>
+            <div class="row">
+                <div style="margin-top: 1em; text-align: center">
+                    <button class="btn btn-lg btn-primary" name="run" type="submit">Start a new tournament table</button>
+                </div>
             </div>
-
         </form>
     </div>
 
@@ -81,48 +101,55 @@
 
 <script>
     var socket = io.connect();
-    window.addEventListener('polymer-ready', function(e) {
+
+    window.addEventListener('polymer-ready', function (e) {
         var pl = document.querySelector("#playerlist");
-        socket.on('game complete', function(msg){
+        socket.on('game complete', function (msg) {
             console.log("received event", msg);
             $("#instructions").hide();
             if (msg.players) {
                 //pl.players = msg.players;
-                pl.round+=1;
+                pl.round += 1;
                 pl.addPlayers(msg.players);
             }
         });
-        $("#runTestButton").click(function(event){
+        $("#runTestButton").click(function (event) {
             $.get("/run-test");
             event.preventDefault();
         });
+        $("#configuration").show();
     });
-    $(function() {
-      $('#create-table').on('submit', function(event) {
-        event.preventDefault();
-        var data = $('#create-table').serialize();
-          console.log("data", data);
-        $.post('/tables', $('#create-table').serialize(), function(data) {
-            console.log(data);
-            $("#create-table").hide();
-            $("#instructions").hide();
-            socket.on('game-complete-' + data.id, function(msg){
-                console.log("received event", msg);
-                if (msg.players) {
-                    var pl = document.querySelector("#playerlist");
-//                    pl.players = msg.players;
-                    pl.round+=1;
-                    pl.addPlayers(msg.players);
-                }
-            });
 
-        }, 'json');
+    $(function () {
+        
+        $('#create-table').on('submit', function (event) {
+            event.preventDefault();
+            var data = $('#create-table').serialize();
+            console.log("data", data);
+            $.post('/tables', $('#create-table').serialize(), function (data) {
+                console.log(data);
+                $("#create-table").hide();
+                $("#running-game").show();
+                console.log("current table id", data.id);
+                var pl = document.querySelector("#playerlist");
+                pl.resetTable();
+                socket.on('game-complete-' + data.id, function (msg) {
+                    if (msg.players) {
+                        pl.round += 1;
+                        pl.setRoundPlayerData(msg.players);
+                    }
+                });
 
-        return false;
-      });
+            }, 'json');
+            return false;
+        });
 
-        $('#remote-bot-list').blur(function(){
-            console.log('bot list', $("#remote-bot-list").val());
+
+        $("#stop-game").click(function () {
+            window.location.reload();
+        });
+
+        $('#remote-bot-list').blur(function () {
             if (window.localStorage) {
                 window.localStorage.setItem('robot-list', $("#remote-bot-list").val());
             }
@@ -130,8 +157,7 @@
         if (window.localStorage) {
             $('#remote-bot-list').val(window.localStorage.getItem('robot-list') || '');
         }
-
-    })
+    });
 </script>
 
 </body>

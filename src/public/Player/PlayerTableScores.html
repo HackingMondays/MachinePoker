@@ -13,7 +13,7 @@
                 <div style="text-align: center;">
                     <template repeat="{{ player in players}}">
                         <div style=" padding: 2px; display: inline-block; width: 256px; margin: 4px; border: 1px solid black; background: rgba(128,128,128, 0.3); text-align: center">
-                            <div style="font-size: 2em; float: right; position: absolute; margin-left: 12px; margin-top: 8px;">#{{player.tableOrder}}</div>
+                            <div style="font-size: 2em; float: right; position: absolute; margin-left: 12px; margin-top: 8px;"><template if="{{ player.chips>0 }}">#{{player.tableOrder}}</template></div>
                             <div id="avatar" style="font-size: 2em; float: right; position: absolute; margin-left: 200px;"><img style="width:48px" src="http://robohash.org/{{player.name}}.png"></div>
                             <div style="font-size:1.3em; font-weight: bold;">{{player.name}}</div>
                             <div>${{ player.chips }}</div>
@@ -44,7 +44,7 @@
                 }
                 return undefined;
             },
-            addPlayers: function(players) {
+            setRoundPlayerData: function(players) {
                 var self = this;
                 players.forEach(function(player) {
                     var playerIndex = self.findPlayerIndexById(player[PLAYER_ID_KEY]);
