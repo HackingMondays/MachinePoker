@@ -44,6 +44,12 @@ module.exports = class TablesController
           response.json table
         else
           response.status(404).end()
+    @app.route('/table/current')
+      .get (request, response) =>
+        response.json(@table.length - 1)
+    @app.route('/table/:id/:number')
+      .get (request, response) =>
+        response.json(@tables[request.params.id]?.games[request.params.number])
   launchGame: (table, roundCount) ->
     realTable = MachinePocker.create
       maxRounds: roundCount || 1000
