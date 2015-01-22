@@ -9,12 +9,8 @@
   "repository": "git://github.com/HackingMondays/MachinePoker.git",
   "author": "Mark Percival <m@mdp.im> (http://markpercival.us)",
   "scripts": {
-    "server": "node_modules/.bin/coffee src/server.coffee",
-    "server-open": "node_modules/.bin/coffee src/server.coffee --open",
-    "test": "rm -rf lib && coffee --compile -o lib/ src/ && mocha --no-colors --compilers coffee:coffee-script test/*_test.coffee",
-    "prepublish": "rm -rf lib && coffee --compile -o lib/ src/",
-    "postinstall": "./node_modules/bower/bin/bower install",
-    "start": "node_modules/.bin/coffee src/server.coffee"
+    "start": "node_modules/.bin/coffee src/server.coffee",
+    "postinstall": "./node_modules/bower/bin/bower install"
   },
   "devDependencies": {
     "mocha": ">=0.0.0",
