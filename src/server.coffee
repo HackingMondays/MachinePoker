@@ -10,7 +10,7 @@ open = require 'open'
 PlayersController = require './controllers/PlayersController'
 TablesController = require './controllers/TablesController'
 
-port = process.env.PORT || 8080;
+port = 8080;
 openBrowser = process.argv.map((s) -> s == "--open").filter((x)->x).length>0;
 
 class Server
