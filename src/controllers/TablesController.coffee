@@ -25,7 +25,7 @@ module.exports = class TablesController
               bots = bots.concat(createdBot);
             callback null
         async.series initBotTasks, (err) =>
-          if !err
+          if !err && bots.length > 1
             table =
               id: @tables.length
               bots: bots
