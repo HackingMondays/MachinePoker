@@ -8,22 +8,23 @@
 	<script src="js/swfobject.js"></script>
 	<script>
 		var flashvars = {
+			serverAddress: "http://92.222.75.24:8080"
 		};
 		var params = {
 			menu: "false",
-			scale: "noScale",
+			scale: "scale",
 			allowFullscreen: "true",
 			allowScriptAccess: "always",
 			bgcolor: "",
-			wmode: "direct" // can cause issues with FP settings & webcam
+			wmode: "direct"
 		};
 		var attributes = {
 			id:"PokerBot"
 		};
 		swfobject.embedSWF(
-			"PokerBot.swf", 
-			"altContent", "800", "600", "12.0.0", 
-			"expressInstall.swf", 
+			"swf/PokerBot.swf", 
+			"altContent", "800", "600", "11.0.0", 
+			"swf/expressInstall.swf", 
 			flashvars, params, attributes);
 	</script>
 	
