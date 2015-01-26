@@ -33,7 +33,7 @@ or bots that play remotely via HTTP and conform to the MachinePoker API
 
 #### Local
 
-    git clone git://github.com/mdp/MachinePoker.git
+    git clone git://github.com/HackingMondays/MachinePoker.git
     cd MachinePoker
     npm install
 
