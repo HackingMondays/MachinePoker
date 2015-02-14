@@ -11,8 +11,10 @@
   "scripts": {
     "server": "node_modules/.bin/coffee src/server.coffee",
     "server-open": "node_modules/.bin/coffee src/server.coffee --open",
+    "postinstall": "cd src/public && ../../node_modules/.bin/bower instal && cd ../..",
+    "clean": "rm -fr node_modules && rm -fr src/public/bower_components && rm -fr lib",
     "test": "rm -rf lib && coffee --compile -o lib/ src/ && mocha --no-colors --compilers coffee:coffee-script test/*_test.coffee",
-    "prepublish": "rm -rf lib && coffee --compile -o lib/ src/"
+    "XXprepublish": "rm -rf lib && coffee --compile -o lib/ src/"
   },
   "devDependencies": {
     "mocha": ">=0.0.0",
